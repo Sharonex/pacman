@@ -34,20 +34,42 @@ ASCII_MAZE = [
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 ]
 
+class PacmanSprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super(PacmanSprite, self).__init__()
+        self.image = pygame.image.load(os.path.join('resources', 'pacman.png'))
+        self.rect = self.image.get_rect()
+
+    def set_rect(self, coordinate):
+        self.rect = self.image.get_rect()
+        self.rect.center = coordinate
+
 class Board:
     BLUE = (0, 0, 255)
     def __init__(self):
-        pass
+        self.group = pygame.sprite.Group()
+        self.pacman_sprite = PacmanSprite()
+        self.group.add(self.pacman_sprite)
+        self.maze_matrix = [list(row) for row in ASCII_MAZE]
+
 
     def init_draw(self, screen):
-        for x, a in enumerate(ASCII_MAZE):
+        for x, a in enumerate(self.maze_matrix):
             for y, b in enumerate(a):
                 if b == 'X':
                     pygame.draw.rect(screen, self.BLUE, (x * MAZE_SIZE[0], y * MAZE_SIZE[1], 30, 30))
 
+    def draw(self, screen):
+        for x, a in enumerate(self.maze_matrix):
+            for y, b in enumerate(a):
+                if b == 'P':
+                    self.pacman_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+        self.group.draw(screen)
 
 
-class Pacman(pygame.sprite.Sprite):
+
+
+class Pacman():
     INIT_POS = (14, 11)
     lifes : int = 3
     coordinate : (int, int) = INIT_POS
@@ -63,12 +85,6 @@ class Pacman(pygame.sprite.Sprite):
         elif self.direction == 'right':
             return (1, 0)
 
-    def __init__(self):
-        super(Pacman, self).__init__()
-        self.image = pygame.image.load(os.path.join('resources', 'pacman.png'))
-        self.rect = self.image.get_rect()
-        self.rect.center = self.coordinate
-
     def update(self, board, keys) -> None:
         if keys[pygame.K_UP]:
             self.direction = 'up'
@@ -81,7 +97,7 @@ class Pacman(pygame.sprite.Sprite):
 
         vec = self.dir2vector()
         next_pos = (self.coordinate[0] + vec[0], self.coordinate[1] + vec[1])
-        next_val = ASCII_MAZE[next_pos[0]][next_pos[1]] 
+        next_val = board.maze_matrix[next_pos[0]][next_pos[1]] 
 
         if next_val == 'X':
             return
@@ -90,8 +106,8 @@ class Pacman(pygame.sprite.Sprite):
             self.lifes -= 1
             next_pos = INIT_POS
         
-        ASCII_MAZE[self.coordinate[0]][self.coordinate[1]] = ' '
-        ASCII_MAZE[next_pos[0]][next_pos[1]] = 'P'
+        board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = ' '
+        board.maze_matrix[next_pos[0]][next_pos[1]] = 'P'
         self.coordinate = next_pos
 
 
@@ -104,9 +120,6 @@ def loop():
     player = Pacman()
     running = True
 
-    group = pygame.sprite.RenderPlain()
-    group.add(player)
-
     board = Board()
     board.init_draw(screen)
 
@@ -117,7 +130,7 @@ def loop():
 
         keys = pygame.key.get_pressed()
         player.update(board, keys)
-        group.draw(screen)
+        board.draw(screen)
         pygame.display.flip()
 
     pygame.quit()
