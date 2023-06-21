@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 import pygame, sys
 
 SCREEN_SIZE = (800, 715)
@@ -89,7 +90,7 @@ class Board:
         self.group.draw(screen)
 
 class Pacman():
-    lifes : int = 3
+    lifes : int = 1
     coordinate : (int, int) = (-1, -1)
     direction : (int, int) = (0, 0)
 
@@ -100,7 +101,7 @@ class Pacman():
                     self.INIT_POS = (x, y)
         self.coordinate = self.INIT_POS
 
-    def update(self, board, direction) -> None:
+    def update(self, board, direction) -> bool:
         self.direction = direction
 
         next_pos = (self.coordinate[0] + self.direction[0], self.coordinate[1] + self.direction[1])
@@ -111,11 +112,15 @@ class Pacman():
         elif next_val in ('I', 'Y', 'C', 'B'):
             # need to respawn
             self.lifes -= 1
+            if self.lifes == 0:
+                return True
             next_pos = self.INIT_POS
 
         board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = ' '
         board.maze_matrix[next_pos[0]][next_pos[1]] = 'P'
         self.coordinate = next_pos
+
+        return False
 
 
 def loop():
@@ -146,7 +151,15 @@ def loop():
                 if event.key == pygame.K_DOWN:
                     direction = (1, 0)
 
-        player.update(board, direction)
+        if player.update(board, direction):
+            image = pygame.image.load(os.path.join('resources', 'game_over.png'))
+            screen.blit(image,(0,0))
+            pygame.display.flip()
+
+            time.sleep(5)
+            running = False
+
+
         screen.fill((0, 0, 0))
         board.draw(screen)
         pygame.display.flip()
