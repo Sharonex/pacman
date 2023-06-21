@@ -36,19 +36,36 @@ ASCII_MAZE = [
 ]
 
 class PlayerSprite(pygame.sprite.Sprite):
+
     def __init__(self,  asset_name):
         super().__init__()
-        self.image = pygame.image.load(os.path.join('resources', asset_name + '.png'))
+        self.orig_image = pygame.image.load(os.path.join('resources', asset_name + '.png'))
+        self.image = self.orig_image
         self.rect = self.image.get_rect()
 
     def set_rect(self, coordinate):
         self.rect = self.image.get_rect()
         self.rect.topleft = coordinate
 
-
 class PacmanSprite(PlayerSprite):
+    coordinate : (int, int) = (-1, -1)
+    direction : str = 'right'
+
     def __init__(self):
         super().__init__('pacman')
+
+    def update(self):
+        super().update()
+        if self.direction == (-1, 0): # up
+            self.image = pygame.transform.rotate(self.orig_image, 90)
+        elif self.direction == (0, 1): # right
+            self.image = self.orig_image
+        elif self.direction == (0, -1): # left
+            self.image = pygame.transform.rotate(self.orig_image, 180)
+            self.image = pygame.transform.flip(self.image, False, True)
+        elif self.direction == (1, 0): # down
+            self.image = pygame.transform.rotate(self.orig_image, 270)
+
 
 class GhostSprite(PlayerSprite):
     def __init__(self, name):
@@ -90,25 +107,24 @@ class Board:
                 if b == 'B':
                     self.blinky_sprite.set_rect((y * BLOCK_SIZE[0], x * BLOCK_SIZE[1]))
 
+        self.group.update()
         self.group.draw(screen)
 
 class Pacman():
-    lifes : int = 1
-    coordinate : (int, int) = (-1, -1)
-    direction : (int, int) = (0, 0)
+    lifes : int = 3
 
     def __init__(self, board) -> None:
         for x, a in enumerate(board.maze_matrix):
             for y, b in enumerate(a):
                 if b == 'P':
                     self.INIT_POS = (x, y)
-        self.coordinate = self.INIT_POS
+        board.pacman_sprite.coordinate = self.INIT_POS
         self.score = 0
 
     def update(self, board, direction) -> bool:
-        self.direction = direction
+        board.pacman_sprite.direction = direction
 
-        next_pos = (self.coordinate[0] + self.direction[0], self.coordinate[1] + self.direction[1])
+        next_pos = (board.pacman_sprite.coordinate[0] + board.pacman_sprite.direction[0], board.pacman_sprite.coordinate[1] + board.pacman_sprite.direction[1])
         next_val = board.maze_matrix[next_pos[0]][next_pos[1]]
 
         if next_val == 'X':
@@ -122,9 +138,9 @@ class Pacman():
                 return True
             next_pos = self.INIT_POS
 
-        board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = 'E'
+        board.maze_matrix[board.pacman_sprite.coordinate[0]][board.pacman_sprite.coordinate[1]] = 'E'
         board.maze_matrix[next_pos[0]][next_pos[1]] = 'P'
-        self.coordinate = next_pos
+        board.pacman_sprite.coordinate = next_pos
 
         return False
 
@@ -141,22 +157,22 @@ def loop():
     player = Pacman(board)
     clock = pygame.time.Clock()
 
-    direction = (0, 0)
+    board.pacman_sprite.direction = (0, 0)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    direction = (0, -1)
+                    board.pacman_sprite.direction = (0, -1)
                 if event.key == pygame.K_RIGHT:
-                    direction = (0, 1)
+                    board.pacman_sprite.direction = (0, 1)
                 if event.key == pygame.K_UP:
-                    direction = (-1, 0)
+                    board.pacman_sprite.direction = (-1, 0)
                 if event.key == pygame.K_DOWN:
-                    direction = (1, 0)
+                    board.pacman_sprite.direction = (1, 0)
 
-        if player.update(board, direction):
+        if player.update(board, board.pacman_sprite.direction):
             image = pygame.image.load(os.path.join('resources', 'game_over.png'))
             screen.blit(image,(0,0))
             pygame.display.flip()
