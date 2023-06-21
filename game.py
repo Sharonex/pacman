@@ -76,15 +76,15 @@ class Board:
                 if b == 'X':
                     pygame.draw.rect(screen, self.BLUE, (y * BLOCK_SIZE[0], x * BLOCK_SIZE[1], BLOCK_SIZE[0], BLOCK_SIZE[1]))
                 if b == 'P':
-                    self.pacman_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
+                    self.pacman_sprite.set_rect((y * BLOCK_SIZE[0], x * BLOCK_SIZE[1]))
                 if b == 'I':
-                    self.inky_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
+                    self.inky_sprite.set_rect((y * BLOCK_SIZE[0], x * BLOCK_SIZE[1]))
                 if b == 'Y':
-                    self.pinky_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
+                    self.pinky_sprite.set_rect((y * BLOCK_SIZE[0], x * BLOCK_SIZE[1]))
                 if b == 'C':
-                    self.clyde_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
+                    self.clyde_sprite.set_rect((y * BLOCK_SIZE[0], x * BLOCK_SIZE[1]))
                 if b == 'B':
-                    self.blinky_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
+                    self.blinky_sprite.set_rect((y * BLOCK_SIZE[0], x * BLOCK_SIZE[1]))
 
         self.group.draw(screen)
 
