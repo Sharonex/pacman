@@ -3,8 +3,8 @@
 import os
 import pygame, sys
 
-SCREEN_SIZE = (800, 800)
-MAZE_SIZE = (28, 28)
+SCREEN_SIZE = (800, 715)
+MAZE_SIZE = (28, 25)
 
 ASCII_MAZE = [
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -15,28 +15,33 @@ ASCII_MAZE = [
     "X                          X",
     "X XXXX XX XXXXXXXX XX XXXX X",
     "X XXXX XX XXXXXXXX XX XXXX X",
-    "X XXXX XX X G  G X XX XXXX X",
-    "X XXXX XX X  G     XX XXXX X",
-    "X XXXX XX XXXXXXXX XX XXXX X",
-    "X XXXX XX XXXXXXXX XX XXXX X",
-    "X                          X",
+    "X      XX    XX    XX      X",
+    "XXXXXX XXXXX XX XXXXX XXXXXX",
+    "XXXXXX XX          XX XXXXXX",
+    "XXXXXX XX XXX  XXX XX XXXXXX",
+    "       XX X G  G X XX       ",
+    "XXXXXX XX X G  G X XX XXXXXX",
+    "XXXXXX XX XXXXXXXX XX XXXXXX",
+    "XXXXXX XX          XX XXXXXX",
+    "XXXXXX XX XXXXXXXX XX XXXXXX",
+    "X            XX            X",
     "X XXXX XXXXX XX XXXXX XXXX X",
-    "X XXXX XXXXX XX XXXXX XXXX X",
-    "X XXXX XXXXX XX XXXXX XXXX X",
-    "XP           XX            X",
+    "X   XX                XX   X",
+    "XXX XX XX XXXXXXXX XX XX XXX",
+    "X      XX    XX    XX      X",
+    "X XXXXXXXXXX XX XXXXXXXXXX X",
+    "XP                         X",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 ]
 
-def convert_to_pixel(maze_size, screen_size) -> int:
-
-
-
 class Board:
     def __init__():
+        pass
 
     def draw(self, screen):
         for x, a in enumerate(self.ascii_maze):
             for y, b in enumerate(x):
+                pass
 
 
 
