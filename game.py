@@ -30,7 +30,7 @@ ASCII_MAZE = [
     "XXX XX XX XXXXXXXX XX XX XXX",
     "X      XX    XX    XX      X",
     "X XXXXXXXXXX XX XXXXXXXXXX X",
-    "X                          X",
+    "X           P              X",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 ]
 
@@ -42,7 +42,7 @@ class PlayerSprite(pygame.sprite.Sprite):
 
     def set_rect(self, coordinate):
         self.rect = self.image.get_rect()
-        self.rect.center = coordinate
+        self.rect.topleft = coordinate
 
 
 class PacmanSprite(PlayerSprite):
@@ -69,28 +69,22 @@ class Board:
         self.group.add(self.blinky_sprite)
         self.maze_matrix = [list(row) for row in ASCII_MAZE]
 
-
-    def init_draw(self, screen):
-        for x, a in enumerate(self.maze_matrix):
-            for y, b in enumerate(a):
-                if b == 'X':
-                    pygame.draw.rect(screen, self.BLUE, (y * MAZE_SIZE[0], x * MAZE_SIZE[1], SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1]))
-
     def draw(self, screen):
+        BLOCK_SIZE = (SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1])
         for x, a in enumerate(self.maze_matrix):
             for y, b in enumerate(a):
                 if b == 'X':
-                    pygame.draw.rect(screen, self.BLUE, (y * MAZE_SIZE[0], x * MAZE_SIZE[1], SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1]))
+                    pygame.draw.rect(screen, self.BLUE, (y * BLOCK_SIZE[0], x * BLOCK_SIZE[1], BLOCK_SIZE[0], BLOCK_SIZE[1]))
                 if b == 'P':
-                    self.pacman_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                    self.pacman_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
                 if b == 'I':
-                    self.inky_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                    self.inky_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
                 if b == 'Y':
-                    self.pinky_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                    self.pinky_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
                 if b == 'C':
-                    self.clyde_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                    self.clyde_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
                 if b == 'B':
-                    self.blinky_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                    self.blinky_sprite.set_rect((x * BLOCK_SIZE[0], y * BLOCK_SIZE[1]))
 
         self.group.draw(screen)
 
@@ -98,20 +92,29 @@ class Board:
 
 
 class Pacman():
-    INIT_POS = (14, 11)
     lifes : int = 3
-    coordinate : (int, int) = INIT_POS
+    coordinate : (int, int) = (-1, -1)
     direction : str = 'right'
+
+    def __init__(self, board) -> None:
+        for x, a in enumerate(board.maze_matrix):
+            for y, b in enumerate(a):
+                if b == 'P':
+                    self.INIT_POS = (x, y)
+                    print("found pacman at: ", self.INIT_POS)
+        self.coordinate = self.INIT_POS
 
     def dir2vector(self):
         if self.direction == 'up':
-            return (0, -1)
-        elif self.direction == 'down':
-            return (0, 1)
-        elif self.direction == 'left':
             return (-1, 0)
-        elif self.direction == 'right':
+        elif self.direction == 'down':
             return (1, 0)
+        elif self.direction == 'left':
+            return (0, -1)
+        elif self.direction == 'right':
+            return (0, 1)
+
+        return (0, 0)
 
     def update(self, board, keys) -> None:
         if keys[pygame.K_UP]:
@@ -145,11 +148,11 @@ def loop():
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Pacman")
 
-    player = Pacman()
     running = True
 
     board = Board()
-    board.init_draw(screen)
+    player = Pacman(board)
+    clock = pygame.time.Clock()
 
     while running:
         for event in pygame.event.get():
@@ -161,6 +164,7 @@ def loop():
         screen.fill((0, 0, 0))
         board.draw(screen)
         pygame.display.flip()
+        clock.tick(3)
 
     pygame.quit()
 
