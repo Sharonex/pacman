@@ -35,13 +35,15 @@ ASCII_MAZE = [
 ]
 
 class Board:
-    def __init__():
+    BLUE = (0, 0, 255)
+    def __init__(self):
         pass
 
-    def draw(self, screen):
-        for x, a in enumerate(self.ascii_maze):
-            for y, b in enumerate(x):
-                pass
+    def init_draw(self, screen):
+        for x, a in enumerate(ASCII_MAZE):
+            for y, b in enumerate(a):
+                if b == 'X':
+                    pygame.draw.rect(screen, self.BLUE, (x * MAZE_SIZE[0], y * MAZE_SIZE[1], 30, 30))
 
 
 
@@ -68,18 +70,18 @@ class Pacman(pygame.sprite.Sprite):
         self.rect.center = self.coordinate
 
     def update(self, board, keys) -> None:
-        if keys.up:
+        if keys[pygame.K_UP]:
             self.direction = 'up'
-        elif keys.down:
+        elif keys[pygame.K_DOWN]:
             self.direction = 'down'
-        elif keys.left:
+        elif keys[pygame.K_LEFT]:
             self.direction = 'left'
-        elif keys.right:
+        elif keys[pygame.K_RIGHT]:
             self.direction = 'right'
 
-        vec = dir2vector()
+        vec = self.dir2vector()
         next_pos = (self.coordinate[0] + vec[0], self.coordinate[1] + vec[1])
-        next_val = board[next_pos[0]][next_pos[1]] 
+        next_val = ASCII_MAZE[next_pos[0]][next_pos[1]] 
 
         if next_val == 'X':
             return
@@ -88,8 +90,8 @@ class Pacman(pygame.sprite.Sprite):
             self.lifes -= 1
             next_pos = INIT_POS
         
-        board[self.coordinate[0]][self.coordinate[1]] = ' '
-        board[next_pos[0]][next_pos[1]] = 'P'
+        ASCII_MAZE[self.coordinate[0]][self.coordinate[1]] = ' '
+        ASCII_MAZE[next_pos[0]][next_pos[1]] = 'P'
         self.coordinate = next_pos
 
 
@@ -105,13 +107,16 @@ def loop():
     group = pygame.sprite.RenderPlain()
     group.add(player)
 
+    board = Board()
+    board.init_draw(screen)
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 break
 
         keys = pygame.key.get_pressed()
-        player.update(keys)
+        player.update(board, keys)
         group.draw(screen)
         pygame.display.flip()
 
