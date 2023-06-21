@@ -8,7 +8,7 @@ MAZE_SIZE = (28, 25)
 
 ASCII_MAZE = [
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "XP           XX            X",
+    "X            XX            X",
     "X XXXX XXXXX XX XXXXX XXXX X",
     "X XXXX XXXXX XX XXXXX XXXX X",
     "X XXXX XXXXX XX XXXXX XXXX X",
@@ -30,7 +30,7 @@ ASCII_MAZE = [
     "XXX XX XX XXXXXXXX XX XX XXX",
     "X      XX    XX    XX      X",
     "X XXXXXXXXXX XX XXXXXXXXXX X",
-    "XP                         X",
+    "X                          X",
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 ]
 
@@ -57,11 +57,13 @@ class Board:
         for x, a in enumerate(self.maze_matrix):
             for y, b in enumerate(a):
                 if b == 'X':
-                    pygame.draw.rect(screen, self.BLUE, (x * MAZE_SIZE[0], y * MAZE_SIZE[1], 30, 30))
+                    pygame.draw.rect(screen, self.BLUE, (y * MAZE_SIZE[0], x * MAZE_SIZE[1], SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1]))
 
     def draw(self, screen):
         for x, a in enumerate(self.maze_matrix):
             for y, b in enumerate(a):
+                if b == 'X':
+                    pygame.draw.rect(screen, self.BLUE, (y * MAZE_SIZE[0], x * MAZE_SIZE[1], SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1]))
                 if b == 'P':
                     self.pacman_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
         self.group.draw(screen)
@@ -104,7 +106,7 @@ class Pacman():
         elif next_val == 'G':
             # need to respawn
             self.lifes -= 1
-            next_pos = INIT_POS
+            next_pos = self.INIT_POS
         
         board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = ' '
         board.maze_matrix[next_pos[0]][next_pos[1]] = 'P'
@@ -130,6 +132,7 @@ def loop():
 
         keys = pygame.key.get_pressed()
         player.update(board, keys)
+        screen.fill((0, 0, 0))
         board.draw(screen)
         pygame.display.flip()
 
