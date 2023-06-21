@@ -19,8 +19,8 @@ ASCII_MAZE = [
     "XXXXXX XXXXX XX XXXXX XXXXXX",
     "XXXXXX XX          XX XXXXXX",
     "XXXXXX XX XXX  XXX XX XXXXXX",
-    "       XX X G  G X XX       ",
-    "XXXXXX XX X G  G X XX XXXXXX",
+    "       XX X I  C X XX       ",
+    "XXXXXX XX X Y  B X XX XXXXXX",
     "XXXXXX XX XXXXXXXX XX XXXXXX",
     "XXXXXX XX          XX XXXXXX",
     "XXXXXX XX XXXXXXXX XX XXXXXX",
@@ -34,22 +34,39 @@ ASCII_MAZE = [
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 ]
 
-class PacmanSprite(pygame.sprite.Sprite):
-    def __init__(self):
-        super(PacmanSprite, self).__init__()
-        self.image = pygame.image.load(os.path.join('resources', 'pacman.png'))
+class PlayerSprite(pygame.sprite.Sprite):
+    def __init__(self,  asset_name):
+        super().__init__()
+        self.image = pygame.image.load(os.path.join('resources', asset_name + '.png'))
         self.rect = self.image.get_rect()
 
     def set_rect(self, coordinate):
         self.rect = self.image.get_rect()
         self.rect.center = coordinate
 
+
+class PacmanSprite(PlayerSprite):
+    def __init__(self):
+        super().__init__('pacman')
+
+class GhostSprite(PlayerSprite):
+    def __init__(self, name):
+        super().__init__(name)
+
 class Board:
     BLUE = (0, 0, 255)
     def __init__(self):
         self.group = pygame.sprite.Group()
         self.pacman_sprite = PacmanSprite()
+        self.inky_sprite = GhostSprite('inky')
+        self.clyde_sprite = GhostSprite('clyde')
+        self.pinky_sprite = GhostSprite('pinky')
+        self.blinky_sprite = GhostSprite('blinky')
         self.group.add(self.pacman_sprite)
+        self.group.add(self.inky_sprite)
+        self.group.add(self.clyde_sprite)
+        self.group.add(self.pinky_sprite)
+        self.group.add(self.blinky_sprite)
         self.maze_matrix = [list(row) for row in ASCII_MAZE]
 
 
@@ -66,6 +83,15 @@ class Board:
                     pygame.draw.rect(screen, self.BLUE, (y * MAZE_SIZE[0], x * MAZE_SIZE[1], SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1]))
                 if b == 'P':
                     self.pacman_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                if b == 'I':
+                    self.inky_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                if b == 'Y':
+                    self.pinky_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                if b == 'C':
+                    self.clyde_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+                if b == 'B':
+                    self.blinky_sprite.set_rect((x * MAZE_SIZE[0], y * MAZE_SIZE[1]))
+
         self.group.draw(screen)
 
 
@@ -99,7 +125,7 @@ class Pacman():
 
         vec = self.dir2vector()
         next_pos = (self.coordinate[0] + vec[0], self.coordinate[1] + vec[1])
-        next_val = board.maze_matrix[next_pos[0]][next_pos[1]] 
+        next_val = board.maze_matrix[next_pos[0]][next_pos[1]]
 
         if next_val == 'X':
             return
@@ -107,7 +133,7 @@ class Pacman():
             # need to respawn
             self.lifes -= 1
             next_pos = self.INIT_POS
-        
+
         board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = ' '
         board.maze_matrix[next_pos[0]][next_pos[1]] = 'P'
         self.coordinate = next_pos
