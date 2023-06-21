@@ -46,10 +46,20 @@ class Board:
 
 
 class Pacman(pygame.sprite.Sprite):
+    INIT_POS = (14, 11)
     lifes : int = 3
-    coordinate : (int, int) = (14, 11)
+    coordinate : (int, int) = INIT_POS
     direction : str = 'right'
 
+    def dir2vector(self):
+        if self.direction == 'up':
+            return (0, -1)
+        elif self.direction == 'down':
+            return (0, 1)
+        elif self.direction == 'left':
+            return (-1, 0)
+        elif self.direction == 'right':
+            return (1, 0)
 
     def __init__(self):
         super(Pacman, self).__init__()
@@ -57,8 +67,30 @@ class Pacman(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.coordinate
 
-    def update(self, keys) -> None:
-        pass
+    def update(self, board, keys) -> None:
+        if keys.up:
+            self.direction = 'up'
+        elif keys.down:
+            self.direction = 'down'
+        elif keys.left:
+            self.direction = 'left'
+        elif keys.right:
+            self.direction = 'right'
+
+        vec = dir2vector()
+        next_pos = (self.coordinate[0] + vec[0], self.coordinate[1] + vec[1])
+        next_val = board[next_pos[0]][next_pos[1]] 
+
+        if next_val == 'X':
+            return
+        elif next_val == 'G':
+            # need to respawn
+            self.lifes -= 1
+            next_pos = INIT_POS
+        
+        board[self.coordinate[0]][self.coordinate[1]] = ' '
+        board[next_pos[0]][next_pos[1]] = 'P'
+        self.coordinate = next_pos
 
 
 def loop():
