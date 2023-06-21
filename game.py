@@ -112,7 +112,7 @@ class Board:
         self.group.draw(screen)
 
 class Pacman():
-    lifes : int = 3
+    lifes : int = 1
 
     def __init__(self, board) -> None:
         for x, a in enumerate(board.maze_matrix):
@@ -190,6 +190,9 @@ def loop():
                     board.pacman_sprite.direction = (1, 0)
 
         if player.update(board, board.pacman_sprite.direction):
+            mixer.music.stop()
+            mixer.music.load(os.path.join('resources', 'game_over.mp3'))
+            mixer.music.play()
             image = pygame.image.load(os.path.join('resources', 'game_over.png'))
             screen.blit(image,(0,0))
             pygame.display.flip()
