@@ -3,6 +3,7 @@
 import os
 import time
 import pygame, sys
+from pygame import mixer
 
 SCREEN_SIZE = (800, 715)
 MAZE_SIZE = (28, 25)
@@ -152,10 +153,26 @@ def loop():
     pygame.display.set_caption("Pacman")
 
     running = True
+    pygame.font.init()
+    font = pygame.font.Font(None, 36)
+
 
     board = Board()
     player = Pacman(board)
     clock = pygame.time.Clock()
+    #Instantiate mixer
+    mixer.init()
+
+    #Load audio file
+    mixer.music.load(os.path.join('resources', 'pacman_theme.mp3'))
+
+    print("music started playing....")
+
+    #Set preferred volume
+    mixer.music.set_volume(0.2)
+
+    #Play the music
+    mixer.music.play()
 
     board.pacman_sprite.direction = (0, 0)
     while running:
@@ -183,6 +200,9 @@ def loop():
 
         screen.fill((0, 0, 0))
         board.draw(screen)
+        score_text = font.render(f'Score: {player.score}', True, (255, 255, 255))
+        screen.blit(score_text, (10, 10))
+
         pygame.display.flip()
         clock.tick(5)
 
