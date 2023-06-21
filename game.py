@@ -88,51 +88,27 @@ class Board:
 
         self.group.draw(screen)
 
-
-
-
 class Pacman():
     lifes : int = 3
     coordinate : (int, int) = (-1, -1)
-    direction : str = 'right'
+    direction : (int, int) = (0, 0)
 
     def __init__(self, board) -> None:
         for x, a in enumerate(board.maze_matrix):
             for y, b in enumerate(a):
                 if b == 'P':
                     self.INIT_POS = (x, y)
-                    print("found pacman at: ", self.INIT_POS)
         self.coordinate = self.INIT_POS
 
-    def dir2vector(self):
-        if self.direction == 'up':
-            return (-1, 0)
-        elif self.direction == 'down':
-            return (1, 0)
-        elif self.direction == 'left':
-            return (0, -1)
-        elif self.direction == 'right':
-            return (0, 1)
+    def update(self, board, direction) -> None:
+        self.direction = direction
 
-        return (0, 0)
-
-    def update(self, board, keys) -> None:
-        if keys[pygame.K_UP]:
-            self.direction = 'up'
-        elif keys[pygame.K_DOWN]:
-            self.direction = 'down'
-        elif keys[pygame.K_LEFT]:
-            self.direction = 'left'
-        elif keys[pygame.K_RIGHT]:
-            self.direction = 'right'
-
-        vec = self.dir2vector()
-        next_pos = (self.coordinate[0] + vec[0], self.coordinate[1] + vec[1])
+        next_pos = (self.coordinate[0] + self.direction[0], self.coordinate[1] + self.direction[1])
         next_val = board.maze_matrix[next_pos[0]][next_pos[1]]
 
         if next_val == 'X':
             return
-        elif next_val == 'G':
+        elif next_val in ('I', 'Y', 'C', 'B'):
             # need to respawn
             self.lifes -= 1
             next_pos = self.INIT_POS
@@ -154,17 +130,27 @@ def loop():
     player = Pacman(board)
     clock = pygame.time.Clock()
 
+    direction = (0, 0)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                print(event.key)
+                if event.key == pygame.K_LEFT:
+                    direction = (0, -1)
+                if event.key == pygame.K_RIGHT:
+                    direction = (0, 1)
+                if event.key == pygame.K_UP:
+                    direction = (-1, 0)
+                if event.key == pygame.K_DOWN:
+                    direction = (1, 0)
 
-        keys = pygame.key.get_pressed()
-        player.update(board, keys)
+        player.update(board, direction)
         screen.fill((0, 0, 0))
         board.draw(screen)
         pygame.display.flip()
-        clock.tick(3)
+        clock.tick(5)
 
     pygame.quit()
 
