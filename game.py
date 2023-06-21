@@ -154,7 +154,7 @@ def loop():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                break
+                running = False
 
         keys = pygame.key.get_pressed()
         player.update(board, keys)
