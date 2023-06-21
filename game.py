@@ -56,6 +56,7 @@ class GhostSprite(PlayerSprite):
 
 class Board:
     BLUE = (0, 0, 255)
+    WHITE = (255, 255, 255)
     def __init__(self):
         self.group = pygame.sprite.Group()
         self.pacman_sprite = PacmanSprite()
@@ -74,6 +75,8 @@ class Board:
         BLOCK_SIZE = (SCREEN_SIZE[0] / MAZE_SIZE[0], SCREEN_SIZE[1] / MAZE_SIZE[1])
         for x, a in enumerate(self.maze_matrix):
             for y, b in enumerate(a):
+                if b == ' ':
+                    pygame.draw.circle(screen, self.WHITE, (y * BLOCK_SIZE[0]+ BLOCK_SIZE[0]/2, x * BLOCK_SIZE[1] + BLOCK_SIZE[1]/2), 2)
                 if b == 'X':
                     pygame.draw.rect(screen, self.BLUE, (y * BLOCK_SIZE[0], x * BLOCK_SIZE[1], BLOCK_SIZE[0], BLOCK_SIZE[1]))
                 if b == 'P':
@@ -100,6 +103,7 @@ class Pacman():
                 if b == 'P':
                     self.INIT_POS = (x, y)
         self.coordinate = self.INIT_POS
+        self.score = 0
 
     def update(self, board, direction) -> bool:
         self.direction = direction
@@ -109,6 +113,8 @@ class Pacman():
 
         if next_val == 'X':
             return
+        if next_val == ' ':
+            self.score += 1
         elif next_val in ('I', 'Y', 'C', 'B'):
             # need to respawn
             self.lifes -= 1
@@ -116,7 +122,7 @@ class Pacman():
                 return True
             next_pos = self.INIT_POS
 
-        board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = ' '
+        board.maze_matrix[self.coordinate[0]][self.coordinate[1]] = 'E'
         board.maze_matrix[next_pos[0]][next_pos[1]] = 'P'
         self.coordinate = next_pos
 
@@ -141,7 +147,6 @@ def loop():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
-                print(event.key)
                 if event.key == pygame.K_LEFT:
                     direction = (0, -1)
                 if event.key == pygame.K_RIGHT:
